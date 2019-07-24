@@ -51,22 +51,24 @@
 //  ABITS             1+     Number of address bits   10      bits
 //  DBITS             1+     Number of data bits      32      bits
 // ------------------------------------------------------------------
-// REUSE ISSUES 
+// REUSE ISSUES
 //   Reset Strategy      : rstn_i; asynchronous, active low
 //   Clock Domains       : clk_i; rising edge
-//   Critical Timing     : 
-//   Test Features       : 
-//   Asynchronous I/F    : none                     
+//   Critical Timing     :
+//   Test Features       :
+//   Asynchronous I/F    : none
 //   Scan Methodology    : na
 //   Instantiations      : No
 //   Synthesizable (y/n) : Yes
-//   Other               : 
+//   Other               :
 // -FHDR-------------------------------------------------------------
 
 
 module rl_ram_1r1w_generic #(
   parameter ABITS      = 10,
-  parameter DBITS      = 32
+  parameter DBITS      = 32,
+  parameter INIT_MEMORY= 0,
+  parameter INIT_FILE  = ""
 )
 (
   input                        rst_ni,
@@ -122,6 +124,32 @@ endgenerate
   //per Altera's recommendations. Prevents bypass logic
   always @(posedge clk_i)
     dout_o <= mem_array[ raddr_i ];
+
+  // Structure used to load program into the memory
+  integer iter;
+  reg [DBITS-1:0]  temp  [2**ABITS-1:0];
+
+  initial begin
+    if (INIT_MEMORY == 1'b1) begin
+      $readmemh(INIT_FILE, temp);
+      $display ("Loading SRAM memory with the program %s",`TEST_PROGRAM);
+      // $display ("SRAM size in ----> %d KiB",MEM_DEPTH_KiB);
+      $display ("SRAM Words size ----> %d Words",2**ABITS);
+      for (int iter=0; iter<2**ABITS; iter++) begin
+        if (^temp[iter] === 1'bx) begin
+          mem_array[iter] = 32'd0;
+        end else begin
+          $display ("[ADDRESS = %d][DATA = %h]",iter,temp[iter]);
+          mem_array[iter] = temp[iter];
+        end
+      end
+    end
+    else begin
+      for (int iter=0; iter<2**ABITS; iter++) begin
+        mem_array[iter] = 32'd0;
+      end
+    end
+  end
 endmodule
 
 

@@ -52,28 +52,30 @@
 //  DBITS             1+     Number of data bits      32      bits
 //  TECHNOLOGY               Technology Name          GENERIC
 // ------------------------------------------------------------------
-// REUSE ISSUES 
+// REUSE ISSUES
 //   Reset Strategy      : asynchronous, active low
-//   Clock Domains       : clk                      
-//   Critical Timing     : 
-//   Test Features       : 
-//   Asynchronous I/F    : none                     
+//   Clock Domains       : clk
+//   Critical Timing     :
+//   Test Features       :
+//   Asynchronous I/F    : none
 //   Scan Methodology    : na
 //   Instantiations      : Yes; technology specific macros
 //   Synthesizable (y/n) : Yes
-//   Other               : 
+//   Other               :
 // -FHDR-------------------------------------------------------------
 
 
 module rl_ram_1r1w #(
   parameter ABITS      = 10,
   parameter DBITS      = 32,
-  parameter TECHNOLOGY = "GENERIC"
+  parameter TECHNOLOGY = "GENERIC",
+  parameter INIT_MEMORY= 0,
+  parameter INIT_FILE  = ""
 )
 (
   input                    rst_ni,
   input                    clk_i,
- 
+
   //Write side
   input  [ ABITS     -1:0] waddr_i,
   input  [ DBITS     -1:0] din_i,
@@ -156,7 +158,9 @@ generate
 
       rl_ram_1r1w_generic #(
         .ABITS ( ABITS ),
-        .DBITS ( DBITS ) )
+        .DBITS ( DBITS ),
+        .INIT_MEMORY( INIT_MEMORY),
+        .INIT_FILE  ( INIT_FILE ))
       ram_inst (
         .rst_ni  ( rst_ni   ),
         .clk_i   ( clk_i    ),
