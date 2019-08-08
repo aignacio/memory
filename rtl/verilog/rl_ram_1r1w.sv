@@ -149,7 +149,7 @@ generate
         .dout_o  ( mem_dout   )
       );
   end
-  else // (TECHNOLOGY == "GENERIC")
+  else if (TECHNOLOGY == "GENERIC")
   begin
       /*
        * GENERIC  -- inferrable memory
@@ -157,6 +157,26 @@ generate
       initial $display ("INFO   : No memory technology specified. Using generic inferred memory (%m)");
 
       rl_ram_1r1w_generic #(
+        .ABITS ( ABITS ),
+        .DBITS ( DBITS ),
+        .INIT_MEMORY( INIT_MEMORY),
+        .INIT_FILE  ( INIT_FILE ))
+      ram_inst (
+        .rst_ni  ( rst_ni   ),
+        .clk_i   ( clk_i    ),
+
+        .waddr_i ( waddr_i  ),
+        .din_i   ( din_i    ),
+        .we_i    ( we_i     ),
+        .be_i    ( be_i     ),
+
+        .raddr_i ( raddr_i  ),
+        .dout_o  ( mem_dout )
+      );
+  end
+  else
+  begin
+      boot_rom_generic #(
         .ABITS ( ABITS ),
         .DBITS ( DBITS ),
         .INIT_MEMORY( INIT_MEMORY),
